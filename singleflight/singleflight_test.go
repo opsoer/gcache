@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-var TN = 0
+var ExecTimes = 0
 
 func TestDoCase1(t *testing.T) {
-	TN = 0
+	ExecTimes = 0
 	var g Ones
 	wg := sync.WaitGroup{}
 	wg.Add(10000)
 	fn := func() (interface{}, error) {
-		TN++
+		ExecTimes++
 		return "", nil
 	}
 	for i := 0; i < 10000; i++ {
@@ -25,14 +25,14 @@ func TestDoCase1(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	fmt.Println(TN)
-	if TN != 1 {
+	fmt.Println(ExecTimes)
+	if ExecTimes != 1 {
 		t.Error("singleFlight err")
 	}
 }
 
 func TestDoCase2(t *testing.T) {
-	TN = 0
+	ExecTimes = 0
 	var g Ones
 	wg := sync.WaitGroup{}
 	wg.Add(100)
@@ -40,7 +40,7 @@ func TestDoCase2(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			i, _ := g.Do("key", func() (interface{}, error) {
-				TN++
+				ExecTimes++
 				return "bar", nil
 			})
 			v := i.(string)
@@ -49,7 +49,7 @@ func TestDoCase2(t *testing.T) {
 			}
 
 			i, _ = g.Do("key1", func() (interface{}, error) {
-				TN++
+				ExecTimes++
 				return "bar", nil
 			})
 			v = i.(string)
@@ -59,14 +59,14 @@ func TestDoCase2(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	fmt.Println(TN)
-	if TN != 2 {
+	fmt.Println(ExecTimes)
+	if ExecTimes != 2 {
 		t.Error("singleFlight err")
 	}
 }
 
 func TestDoCase3(t *testing.T) {
-	TN = 0
+	ExecTimes = 0
 	var g Ones
 	wg := sync.WaitGroup{}
 	wg.Add(100)
@@ -74,7 +74,7 @@ func TestDoCase3(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			i, _ := g.Do("key", func() (interface{}, error) {
-				TN++
+				ExecTimes++
 				return "bar", nil
 			})
 			v := i.(string)
@@ -89,7 +89,7 @@ func TestDoCase3(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			i, _ := g.Do("key", func() (interface{}, error) {
-				TN++
+				ExecTimes++
 				return "bar", nil
 			})
 			v := i.(string)
@@ -99,8 +99,8 @@ func TestDoCase3(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	fmt.Println(TN)
-	if TN != 2 {
+	fmt.Println(ExecTimes)
+	if ExecTimes != 2 {
 		t.Error("singleFlight err")
 	}
 }
